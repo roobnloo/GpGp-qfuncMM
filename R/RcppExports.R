@@ -1141,6 +1141,15 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L, a
     .Call('_GpGp_vecchia_Linv', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNarray, start_ind, additional_info)
 }
 
+#' Compute QFunc Covariance Matrix.
+#'
+#' @param stage1_parms A 2 x 5 matrix of stage 1 paramerters.
+#' @param covparms 5-vector of stage1 parameters.
+#' @param locs A matrix with \code{n} rows and 5 columns.
+test_qfunc_cov <- function(stage1_parms, covparms, locs) {
+    .Call('_GpGp_test_qfunc_cov', PACKAGE = 'GpGp', stage1_parms, covparms, locs)
+}
+
 #' Vecchia's loglikelihood, gradient, and Fisher information
 #'
 #' This function returns Vecchia's (1988) approximation to the Gaussian

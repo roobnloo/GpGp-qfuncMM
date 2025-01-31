@@ -883,6 +883,19 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// test_qfunc_cov
+arma::mat test_qfunc_cov(arma::mat stage1_parms, arma::vec covparms, arma::mat locs);
+RcppExport SEXP _GpGp_test_qfunc_cov(SEXP stage1_parmsSEXP, SEXP covparmsSEXP, SEXP locsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type stage1_parms(stage1_parmsSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type covparms(covparmsSEXP);
+    Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
+    rcpp_result_gen = Rcpp::wrap(test_qfunc_cov(stage1_parms, covparms, locs));
+    return rcpp_result_gen;
+END_RCPP
+}
 // vecchia_profbeta_loglik_grad_info
 List vecchia_profbeta_loglik_grad_info(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix X, const NumericMatrix locs, NumericMatrix NNarray, NumericMatrix additional_info);
 RcppExport SEXP _GpGp_vecchia_profbeta_loglik_grad_info(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP XSEXP, SEXP locsSEXP, SEXP NNarraySEXP, SEXP additional_infoSEXP) {
@@ -1053,6 +1066,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_Linv_t_mult", (DL_FUNC) &_GpGp_Linv_t_mult, 3},
     {"_GpGp_L_t_mult", (DL_FUNC) &_GpGp_L_t_mult, 3},
     {"_GpGp_vecchia_Linv", (DL_FUNC) &_GpGp_vecchia_Linv, 6},
+    {"_GpGp_test_qfunc_cov", (DL_FUNC) &_GpGp_test_qfunc_cov, 3},
     {"_GpGp_vecchia_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik_grad_info, 7},
     {"_GpGp_vecchia_profbeta_loglik", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik, 6},
     {"_GpGp_vecchia_meanzero_loglik", (DL_FUNC) &_GpGp_vecchia_meanzero_loglik, 5},
