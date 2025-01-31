@@ -5,6 +5,9 @@
 #include <string>
 //[[Rcpp::depends(RcppArmadillo)]]
 
+#include "Rcpp/Nullable.h"
+#include "Rcpp/vector/instantiation.h"
+#include "armadillo"
 #include "covmatrix_funs.h"
 
 #ifdef _OPENMP
@@ -158,7 +161,8 @@ void compute_pieces(
     vec* dlogdet,
     mat* ainfo,
     int profbeta,
-    int grad_info
+    int grad_info,
+    const arma::mat additional_info
 ){
 
     // data dimensions
@@ -177,9 +181,9 @@ void compute_pieces(
     /* p_covfun is an array of length 1. Its entry is a pointer to a function which takes
      in arma::vec and arma::mat and returns mat. p_d_covfun is analogous. This was a workaround for the solaris bug*/
 
-    mat (*p_covfun[1])(arma::vec, arma::mat);
-    cube (*p_d_covfun[1])(arma::vec, arma::mat);
-    get_covfun(covfun_name_string, p_covfun, p_d_covfun);
+    std::function<arma::mat(const arma::vec &, const arma::mat &)> p_covfun[1];
+    std::function<arma::cube(const arma::vec &, const arma::mat &)> p_d_covfun[1];
+    get_covfun(covfun_name_string, p_covfun, p_d_covfun, additional_info);
     
 
 #pragma omp parallel 
@@ -367,7 +371,8 @@ void compute_pieces_grouped(
     vec* dlogdet,
     mat* ainfo,
     bool profbeta,
-    bool grad_info
+    bool grad_info,
+    const arma::mat additional_info
 ){
 
     // data dimensions
@@ -383,9 +388,9 @@ void compute_pieces_grouped(
     covfun_name_string = covfun_name[0];
     
     // assign covariance fun and derivative based on covfun_name_string
-    mat (*p_covfun[1])(arma::vec, arma::mat);
-    cube (*p_d_covfun[1])(arma::vec, arma::mat);
-    get_covfun(covfun_name_string, p_covfun, p_d_covfun);
+    std::function<arma::mat(const arma::vec &, const arma::mat &)> p_covfun[1];
+    std::function<arma::cube(const arma::vec &, const arma::mat &)> p_d_covfun[1];
+    get_covfun(covfun_name_string, p_covfun, p_d_covfun, additional_info);
 
     // vector of all indices
     arma::vec all_inds = NNlist["all_inds"];
@@ -592,7 +597,8 @@ void synthesize(
     NumericMatrix* info,
     NumericMatrix* betainfo,
     bool profbeta,
-    bool grad_info ){
+    bool grad_info,
+    NumericMatrix additional_info = NumericMatrix()){
 
     // data dimensions
     int n = y.length();
@@ -614,6 +620,8 @@ void synthesize(
     arma::vec dlogdet = arma::vec(nparms, fill::zeros);
     // fisher information
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
+    arma::mat additional_info_c = arma::mat(
+      additional_info.begin(), additional_info.nrow(), additional_info.ncol());
 
     // this is where the big computation happens
     // first convert Numeric- to arma
@@ -626,7 +634,7 @@ void synthesize(
     compute_pieces(
         covparms_c, covfun_name, locs_c, NNarray_c, y_c, X_c,
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
-        profbeta, grad_info
+        profbeta, grad_info, additional_info_c
     );
         
     // synthesize everything and update loglik, grad, beta, betainfo, info
@@ -690,7 +698,8 @@ void synthesize_grouped(
     NumericMatrix* info,
     NumericMatrix* betainfo,
     bool profbeta,
-    bool grad_info){
+    bool grad_info,
+    NumericMatrix additional_info = NumericMatrix()){
 
     // data dimensions
     int n = y.length();
@@ -712,6 +721,8 @@ void synthesize_grouped(
     arma::vec dlogdet = arma::vec(nparms, fill::zeros);
     // fisher information
     arma::mat ainfo = arma::mat(nparms, nparms, fill::zeros);
+    arma::mat additional_info_c = arma::mat(
+      additional_info.begin(), additional_info.nrow(), additional_info.ncol());
     
     // this is where the big computation happens
     
@@ -725,7 +736,7 @@ void synthesize_grouped(
     compute_pieces_grouped(
         covparms_c, covfun_name, locs_c, NNlist, y_c, X_c,
         &XSX, &ySX, &ySy, &logdet, &dXSX, &dySX, &dySy, &dlogdet, &ainfo,
-        profbeta, grad_info
+        profbeta, grad_info, additional_info_c
     );
         
     // synthesize everything and update loglik, grad, beta, betainfo, info
@@ -803,7 +814,8 @@ NumericMatrix vecchia_Linv(
     StringVector covfun_name,
     arma::mat locs,
     arma::mat NNarray, 
-    int start_ind = 1){
+    int start_ind = 1,
+    Rcpp::Nullable<arma::mat> additional_info = R_NilValue){
     
     // data dimensions
     int n = locs.n_rows;
@@ -816,9 +828,13 @@ NumericMatrix vecchia_Linv(
     covfun_name_string = covfun_name[0];
     
     // assign covariance fun and derivative based on covfun_name_string
-    mat (*p_covfun[1])(arma::vec, arma::mat);
-    cube (*p_d_covfun[1])(arma::vec, arma::mat);
-    get_covfun(covfun_name_string, p_covfun, p_d_covfun);
+    std::function<arma::mat(const arma::vec &, const arma::mat &)> p_covfun[1];
+    std::function<arma::cube(const arma::vec &, const arma::mat &)> p_d_covfun[1];
+    arma::mat additional_info_c = mat();
+    if (additional_info.isNotNull()) {
+        additional_info_c = Rcpp::as<arma::mat>(additional_info);
+    }
+    get_covfun(covfun_name_string, p_covfun, p_d_covfun, additional_info_c);
     
     arma::mat Linv = arma::mat(n, m, fill::zeros);
     // loop over every observation    

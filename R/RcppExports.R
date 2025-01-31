@@ -1135,8 +1135,8 @@ L_t_mult <- function(Linv, z, NNarray) {
 #' NNarray <- find_ordered_nn(locs,20)
 #' Linv <- vecchia_Linv(covparms, "matern_isotropic", locs, NNarray)
 #' @export
-vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L) {
-    .Call('_GpGp_vecchia_Linv', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNarray, start_ind)
+vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L, additional_info = NULL) {
+    .Call('_GpGp_vecchia_Linv', PACKAGE = 'GpGp', covparms, covfun_name, locs, NNarray, start_ind, additional_info)
 }
 
 #' Vecchia's loglikelihood, gradient, and Fisher information
@@ -1151,6 +1151,8 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L) {
 #' @inheritParams vecchia_meanzero_loglik
 #' @param X Design matrix of covariates. Row \code{i} of \code{X} contains
 #' the covariates for the observation at row \code{i} of \code{locs}.
+#' @param additional_info A matrix of additional information that can be passed
+#'   to the covariance function.
 #' @return A list containing 
 #' \itemize{
 #'     \item \code{loglik}: the loglikelihood
@@ -1173,8 +1175,8 @@ vecchia_Linv <- function(covparms, covfun_name, locs, NNarray, start_ind = 1L) {
 #' #loglik <- vecchia_profbeta_loglik_grad_info( covparms, "matern_isotropic", 
 #' #    y, X, locs, NNarray )
 #' @export
-vecchia_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNarray) {
-    .Call('_GpGp_vecchia_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNarray)
+vecchia_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNarray, additional_info = matrix()) {
+    .Call('_GpGp_vecchia_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNarray, additional_info)
 }
 
 #' Vecchia's approximation to the Gaussian loglikelihood, with profiled 
@@ -1264,6 +1266,8 @@ vecchia_meanzero_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
 #' @inheritParams vecchia_grouped_meanzero_loglik
 #' @param X Design matrix of covariates. Row \code{i} of \code{X} contains
 #' the covariates for the observation at row \code{i} of \code{locs}.
+#' @param additional_info A matrix of additional information that can be passed
+#'   to the covariance function.
 #' @return a list containing
 #' \itemize{
 #'     \item \code{loglik}: the loglikelihood
@@ -1288,8 +1292,8 @@ vecchia_meanzero_loglik <- function(covparms, covfun_name, y, locs, NNarray) {
 #' #loglik <- vecchia_grouped_profbeta_loglik_grad_info( 
 #' #    covparms, "matern_isotropic", y, X, locs, NNlist )
 #' @export
-vecchia_grouped_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNlist) {
-    .Call('_GpGp_vecchia_grouped_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNlist)
+vecchia_grouped_profbeta_loglik_grad_info <- function(covparms, covfun_name, y, X, locs, NNlist, additional_info = matrix()) {
+    .Call('_GpGp_vecchia_grouped_profbeta_loglik_grad_info', PACKAGE = 'GpGp', covparms, covfun_name, y, X, locs, NNlist, additional_info)
 }
 
 #' Grouped Vecchia approximation, profiled regression coefficients

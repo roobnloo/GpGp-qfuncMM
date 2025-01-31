@@ -4,7 +4,15 @@
 \alias{vecchia_profbeta_loglik_grad_info}
 \title{Vecchia's loglikelihood, gradient, and Fisher information}
 \usage{
-vecchia_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNarray)
+vecchia_profbeta_loglik_grad_info(
+  covparms,
+  covfun_name,
+  y,
+  X,
+  locs,
+  NNarray,
+  additional_info = matrix()
+)
 }
 \arguments{
 \item{covparms}{A vector of covariance parameters appropriate
@@ -26,6 +34,9 @@ the number of rows of \code{locs}.}
 Row \code{i} contains the indices
 of the observations that observation \code{i} conditions on. By convention,
 the first element of row \code{i} is \code{i}.}
+
+\item{additional_info}{A matrix of additional information that can be passed
+to the covariance function.}
 }
 \value{
 A list containing 

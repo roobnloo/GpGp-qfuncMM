@@ -868,8 +868,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // vecchia_Linv
-NumericMatrix vecchia_Linv(arma::vec covparms, StringVector covfun_name, arma::mat locs, arma::mat NNarray, int start_ind);
-RcppExport SEXP _GpGp_vecchia_Linv(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP locsSEXP, SEXP NNarraySEXP, SEXP start_indSEXP) {
+NumericMatrix vecchia_Linv(arma::vec covparms, StringVector covfun_name, arma::mat locs, arma::mat NNarray, int start_ind, Rcpp::Nullable<arma::mat> additional_info);
+RcppExport SEXP _GpGp_vecchia_Linv(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP locsSEXP, SEXP NNarraySEXP, SEXP start_indSEXP, SEXP additional_infoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -878,13 +878,14 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type locs(locsSEXP);
     Rcpp::traits::input_parameter< arma::mat >::type NNarray(NNarraySEXP);
     Rcpp::traits::input_parameter< int >::type start_ind(start_indSEXP);
-    rcpp_result_gen = Rcpp::wrap(vecchia_Linv(covparms, covfun_name, locs, NNarray, start_ind));
+    Rcpp::traits::input_parameter< Rcpp::Nullable<arma::mat> >::type additional_info(additional_infoSEXP);
+    rcpp_result_gen = Rcpp::wrap(vecchia_Linv(covparms, covfun_name, locs, NNarray, start_ind, additional_info));
     return rcpp_result_gen;
 END_RCPP
 }
 // vecchia_profbeta_loglik_grad_info
-List vecchia_profbeta_loglik_grad_info(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix X, const NumericMatrix locs, NumericMatrix NNarray);
-RcppExport SEXP _GpGp_vecchia_profbeta_loglik_grad_info(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP XSEXP, SEXP locsSEXP, SEXP NNarraySEXP) {
+List vecchia_profbeta_loglik_grad_info(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix X, const NumericMatrix locs, NumericMatrix NNarray, NumericMatrix additional_info);
+RcppExport SEXP _GpGp_vecchia_profbeta_loglik_grad_info(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP XSEXP, SEXP locsSEXP, SEXP NNarraySEXP, SEXP additional_infoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -894,7 +895,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
     Rcpp::traits::input_parameter< const NumericMatrix >::type locs(locsSEXP);
     Rcpp::traits::input_parameter< NumericMatrix >::type NNarray(NNarraySEXP);
-    rcpp_result_gen = Rcpp::wrap(vecchia_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNarray));
+    Rcpp::traits::input_parameter< NumericMatrix >::type additional_info(additional_infoSEXP);
+    rcpp_result_gen = Rcpp::wrap(vecchia_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNarray, additional_info));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -930,8 +932,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // vecchia_grouped_profbeta_loglik_grad_info
-List vecchia_grouped_profbeta_loglik_grad_info(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix X, const NumericMatrix locs, List NNlist);
-RcppExport SEXP _GpGp_vecchia_grouped_profbeta_loglik_grad_info(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP XSEXP, SEXP locsSEXP, SEXP NNlistSEXP) {
+List vecchia_grouped_profbeta_loglik_grad_info(NumericVector covparms, StringVector covfun_name, NumericVector y, NumericMatrix X, const NumericMatrix locs, List NNlist, NumericMatrix additional_info);
+RcppExport SEXP _GpGp_vecchia_grouped_profbeta_loglik_grad_info(SEXP covparmsSEXP, SEXP covfun_nameSEXP, SEXP ySEXP, SEXP XSEXP, SEXP locsSEXP, SEXP NNlistSEXP, SEXP additional_infoSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -941,7 +943,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< NumericMatrix >::type X(XSEXP);
     Rcpp::traits::input_parameter< const NumericMatrix >::type locs(locsSEXP);
     Rcpp::traits::input_parameter< List >::type NNlist(NNlistSEXP);
-    rcpp_result_gen = Rcpp::wrap(vecchia_grouped_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNlist));
+    Rcpp::traits::input_parameter< NumericMatrix >::type additional_info(additional_infoSEXP);
+    rcpp_result_gen = Rcpp::wrap(vecchia_grouped_profbeta_loglik_grad_info(covparms, covfun_name, y, X, locs, NNlist, additional_info));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -1049,11 +1052,11 @@ static const R_CallMethodDef CallEntries[] = {
     {"_GpGp_L_mult", (DL_FUNC) &_GpGp_L_mult, 3},
     {"_GpGp_Linv_t_mult", (DL_FUNC) &_GpGp_Linv_t_mult, 3},
     {"_GpGp_L_t_mult", (DL_FUNC) &_GpGp_L_t_mult, 3},
-    {"_GpGp_vecchia_Linv", (DL_FUNC) &_GpGp_vecchia_Linv, 5},
-    {"_GpGp_vecchia_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik_grad_info, 6},
+    {"_GpGp_vecchia_Linv", (DL_FUNC) &_GpGp_vecchia_Linv, 6},
+    {"_GpGp_vecchia_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik_grad_info, 7},
     {"_GpGp_vecchia_profbeta_loglik", (DL_FUNC) &_GpGp_vecchia_profbeta_loglik, 6},
     {"_GpGp_vecchia_meanzero_loglik", (DL_FUNC) &_GpGp_vecchia_meanzero_loglik, 5},
-    {"_GpGp_vecchia_grouped_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_grouped_profbeta_loglik_grad_info, 6},
+    {"_GpGp_vecchia_grouped_profbeta_loglik_grad_info", (DL_FUNC) &_GpGp_vecchia_grouped_profbeta_loglik_grad_info, 7},
     {"_GpGp_vecchia_grouped_profbeta_loglik", (DL_FUNC) &_GpGp_vecchia_grouped_profbeta_loglik, 6},
     {"_GpGp_vecchia_grouped_meanzero_loglik", (DL_FUNC) &_GpGp_vecchia_grouped_meanzero_loglik, 5},
     {NULL, NULL, 0}

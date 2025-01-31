@@ -10,7 +10,8 @@ vecchia_grouped_profbeta_loglik_grad_info(
   y,
   X,
   locs,
-  NNlist
+  NNlist,
+  additional_info = matrix()
 )
 }
 \arguments{
@@ -30,6 +31,9 @@ of element \code{i} of \code{y}, and so the length of \code{y} should equal
 the number of rows of \code{locs}.}
 
 \item{NNlist}{A neighbor list object, the output from \code{\link{group_obs}}.}
+
+\item{additional_info}{A matrix of additional information that can be passed
+to the covariance function.}
 }
 \value{
 a list containing

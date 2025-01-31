@@ -6,3 +6,5 @@ inst/doc
 .gitignore~
 src/*.so
 src/*.o
+compile_flags.txt
+scratch

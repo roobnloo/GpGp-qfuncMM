@@ -1,11 +1,9 @@
 
 #define BOOST_DISABLE_ASSERTS
 
+#include "onepass.h"
 #include <RcppArmadillo.h>
 #include <math.h>
-#include <iostream>
-#include <vector>
-#include "onepass.h"
 //[[Rcpp::depends(RcppArmadillo)]]
 //[[Rcpp::depends(BH)]]
 
@@ -25,6 +23,8 @@ using namespace Rcpp;
 //' @inheritParams vecchia_meanzero_loglik
 //' @param X Design matrix of covariates. Row \code{i} of \code{X} contains
 //' the covariates for the observation at row \code{i} of \code{locs}.
+//' @param additional_info A matrix of additional information that can be passed
+//'   to the covariance function.
 //' @return A list containing 
 //' \itemize{
 //'     \item \code{loglik}: the loglikelihood
@@ -54,7 +54,8 @@ List vecchia_profbeta_loglik_grad_info(
     NumericVector y,
     NumericMatrix X,
     const NumericMatrix locs,
-    NumericMatrix NNarray ){
+    NumericMatrix NNarray,
+    NumericMatrix additional_info = NumericMatrix()){
     
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
@@ -65,7 +66,7 @@ List vecchia_profbeta_loglik_grad_info(
     // this function calls arma_onepass_compute_pieces
     // then synthesizes the result into loglik, beta, grad, info, betainfo
     synthesize(covparms, covfun_name, locs, NNarray, y, X,
-        &ll, &betahat, &grad, &info, &betainfo, true, true 
+        &ll, &betahat, &grad, &info, &betainfo, true, true, additional_info
     );
     
     List ret = List::create( Named("loglik") = ll, Named("betahat") = betahat,
@@ -211,6 +212,8 @@ List vecchia_meanzero_loglik(
 //' @inheritParams vecchia_grouped_meanzero_loglik
 //' @param X Design matrix of covariates. Row \code{i} of \code{X} contains
 //' the covariates for the observation at row \code{i} of \code{locs}.
+//' @param additional_info A matrix of additional information that can be passed
+//'   to the covariance function.
 //' @return a list containing
 //' \itemize{
 //'     \item \code{loglik}: the loglikelihood
@@ -242,7 +245,8 @@ List vecchia_grouped_profbeta_loglik_grad_info(
     NumericVector y,
     NumericMatrix X,
     const NumericMatrix locs,
-    List NNlist ){
+    List NNlist,
+    NumericMatrix additional_info = NumericMatrix()){
     
     NumericVector ll(1);
     NumericVector grad( covparms.length() );
@@ -255,7 +259,7 @@ List vecchia_grouped_profbeta_loglik_grad_info(
     // maybe the synthesize functions should take in an argument that
     // says which compute_pieces function to use
     synthesize_grouped(covparms, covfun_name, locs, NNlist, y, X,
-        &ll, &betahat, &grad, &info, &betainfo, true, true 
+        &ll, &betahat, &grad, &info, &betainfo, true, true, additional_info
     );
     
     
