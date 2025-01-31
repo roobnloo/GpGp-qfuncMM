@@ -122,6 +122,7 @@ order_coordinate <- function( locs, coordinate ){
 #' and temporal coordinates are scaled. If \code{NULL}, the function
 #' uses the locations to automatically select a scaling.
 #' If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).
+#' @param exclude_dims Vector of dimensions to exclude from distance calculations.
 #' @return A vector of indices giving the ordering, i.e. 
 #' the first element of this vector is the index of the first location.
 #' @examples
@@ -146,10 +147,13 @@ order_coordinate <- function( locs, coordinate ){
 #' 
 #' @export
 order_maxmin <- function(locs, lonlat = FALSE, 
-    space_time = FALSE, st_scale = NULL){
+    space_time = FALSE, st_scale = NULL, exclude_dims = NULL){
 
     # make sure locs is a matrix (for 1D case, and data frame case)
     locs <- as.matrix(locs)
+    if (!is.null(exclude_dims)) {
+        locs <- locs[, -exclude_dims, drop = FALSE]
+    }
     
     # FNN::get.knnx has strange behavior for exact matches
     # so add a small amount of noise to each location

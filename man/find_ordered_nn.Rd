@@ -4,7 +4,7 @@
 \alias{find_ordered_nn}
 \title{Find ordered nearest neighbors.}
 \usage{
-find_ordered_nn(locs, m, lonlat = FALSE, st_scale = NULL)
+find_ordered_nn(locs, m, lonlat = FALSE, st_scale = NULL, exclude_dims = NULL)
 }
 \arguments{
 \item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
@@ -24,6 +24,8 @@ and the temporal dimension is divided by \code{st_scale[2]}, before distances ar
 calculated. If \code{st_scale} is \code{NULL}, no scaling is used. We 
 recommend setting \code{st_scale} manually so that each observation gets
 neighbors that hail multiple directions in space and time.}
+
+\item{exclude_dims}{Vector of dimensions to exclude from distance calculations.}
 }
 \value{
 An matrix containing the indices of the neighbors. Row \code{i} of the

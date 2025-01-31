@@ -66,4 +66,4 @@
 #' @name GpGp
 #' @useDynLib GpGp
 #' @importFrom Rcpp sourceCpp
-NULL
+"_PACKAGE"

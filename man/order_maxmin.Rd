@@ -4,7 +4,13 @@
 \alias{order_maxmin}
 \title{Maximum minimum distance ordering}
 \usage{
-order_maxmin(locs, lonlat = FALSE, space_time = FALSE, st_scale = NULL)
+order_maxmin(
+  locs,
+  lonlat = FALSE,
+  space_time = FALSE,
+  st_scale = NULL,
+  exclude_dims = NULL
+)
 }
 \arguments{
 \item{locs}{A matrix of locations. Each row of \code{locs} contains a location, which can
@@ -21,6 +27,8 @@ FALSE otherwise. If set to TRUE, temporal dimension is ignored.}
 and temporal coordinates are scaled. If \code{NULL}, the function
 uses the locations to automatically select a scaling.
 If set to FALSE, temporal dimension treated as another spatial dimension (not recommended).}
+
+\item{exclude_dims}{Vector of dimensions to exclude from distance calculations.}
 }
 \value{
 A vector of indices giving the ordering, i.e. 

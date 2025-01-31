@@ -706,7 +706,6 @@ void synthesize_grouped(
     //int m = NNarray.ncol();
     int p = X.ncol();
     int nparms = covparms.length();
-    int dim = locs.ncol();
     
     // likelihood objects
     arma::mat XSX = arma::mat(p, p, fill::zeros);
@@ -798,6 +797,8 @@ void synthesize_grouped(
 //' @inheritParams vecchia_meanzero_loglik
 //' @param start_ind Compute entries of Linv only for rows \code{start_ind}
 //' until the last row. 
+//' @param additional_info A matrix of additional information that can be passed
+//'   to the covariance function.
 //' @return matrix containing entries of inverse Cholesky
 //' @examples
 //' n1 <- 40

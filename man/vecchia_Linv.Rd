@@ -31,6 +31,9 @@ the first element of row \code{i} is \code{i}.}
 
 \item{start_ind}{Compute entries of Linv only for rows \code{start_ind}
 until the last row.}
+
+\item{additional_info}{A matrix of additional information that can be passed
+to the covariance function.}
 }
 \value{
 matrix containing entries of inverse Cholesky

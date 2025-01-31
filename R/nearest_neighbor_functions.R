@@ -56,6 +56,7 @@ find_ordered_nn_brute <- function( locs, m ){
 #' calculated. If \code{st_scale} is \code{NULL}, no scaling is used. We 
 #' recommend setting \code{st_scale} manually so that each observation gets
 #' neighbors that hail multiple directions in space and time.
+#' @param exclude_dims Vector of dimensions to exclude from distance calculations.
 #' @return An matrix containing the indices of the neighbors. Row \code{i} of the
 #' returned matrix contains the indices of the nearest \code{m}
 #' locations to the \code{i}'th location. Indices are ordered within a
@@ -78,10 +79,13 @@ find_ordered_nn_brute <- function( locs, m ){
 #' points( locsord[NNarray[ind,2:(m+1)],1], 
 #'     locsord[NNarray[ind,2:(m+1)],2], col = "blue", cex = 1.5 )
 #' @export
-find_ordered_nn <- function(locs,m, lonlat = FALSE, st_scale = NULL){
+find_ordered_nn <- function(locs,m, lonlat = FALSE, st_scale = NULL, exclude_dims = NULL) {
     
     # convert locs to matrix (works on vectors and data frames)
     locs <- as.matrix(locs)
+    if (!is.null(exclude_dims)) {
+        locs <- locs[, -exclude_dims, drop=FALSE]
+    }
 
     # number of locations
     n <- nrow(locs)

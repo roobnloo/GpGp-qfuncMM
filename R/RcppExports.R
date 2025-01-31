@@ -1125,6 +1125,8 @@ L_t_mult <- function(Linv, z, NNarray) {
 #' @inheritParams vecchia_meanzero_loglik
 #' @param start_ind Compute entries of Linv only for rows \code{start_ind}
 #' until the last row. 
+#' @param additional_info A matrix of additional information that can be passed
+#'   to the covariance function.
 #' @return matrix containing entries of inverse Cholesky
 #' @examples
 #' n1 <- 40
