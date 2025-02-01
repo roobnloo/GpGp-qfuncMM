@@ -1155,7 +1155,6 @@ test_qfunc_cov <- function(stage1_parms, covparms, locs) {
 #' @param stage1_parms A 2 x 5 matrix of stage 1 paramerters.
 #' @param covparms 5-vector of stage1 parameters.
 #' @param locs A matrix with \code{n} rows and 5 columns.
-#' @noRd
 test_d_qfunc_cov <- function(stage1_parms, covparms, locs) {
     .Call('_GpGp_test_d_qfunc_cov', PACKAGE = 'GpGp', stage1_parms, covparms, locs)
 }

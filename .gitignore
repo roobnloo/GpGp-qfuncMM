@@ -9,3 +9,4 @@ src/*.o
 compile_flags.txt
 scratch
 .vscode
+.lintr
