@@ -17,18 +17,17 @@ private:
 public:
   QFuncCovariance(const arma::mat &stage1_parms);
   bool IsNoisy(uint region) const;
-  arma::mat operator()(const arma::vec &covparms,
-                       const arma::mat &locsub) const;
+  arma::mat operator()(const arma::vec &covparms, const arma::mat &locs) const;
 };
 
 class DQFuncCovariance {
 private:
-  arma::mat stage1_parms;
+  const arma::mat &stage1_parms;
 
 public:
-  DQFuncCovariance(arma::mat stage1_parms);
-  arma::cube operator()(const arma::vec &covparms,
-                        const arma::mat &locsub) const;
+  DQFuncCovariance(const arma::mat &stage1_parms);
+  bool IsNoisy(uint region) const;
+  arma::cube operator()(const arma::vec &covparms, const arma::mat &locs) const;
 };
 
 #endif // QFUNC_COVARIANCE_H

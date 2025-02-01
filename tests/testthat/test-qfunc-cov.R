@@ -32,4 +32,7 @@ test_that("QFunc Covariance Matrix", {
     ncol = 4, byrow = TRUE
   )
   expect_equal(covmx, expect_c)
+
+  dcov <- test_d_qfunc_cov(s1, s2, locs)
+  expect_equal(dim(dcov), c(4, 4, 5))
 })
