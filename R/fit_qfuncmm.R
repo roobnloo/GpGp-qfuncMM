@@ -21,7 +21,13 @@ fit_qfuncmm <- function(
   stopifnot("ncol(region1) and nrow(r1_coords) must be equal" = ncol(region1) == nrow(r1_coords))
   stopifnot("ncol(region2) and nrow(r2_coords) must be equal" = ncol(region2) == nrow(r2_coords))
   stopifnot("length(start_parms) must be equal to 5" = length(start_parms) == 5)
-  stopifnot("start_parms must be in the right range" = all(start_parms >= 0) && start_parms[1] <= 1)
+
+  if (start_parms[1] < -1 || start_parms[1] > 1) {
+    stop("start_parms[1] (rho) should be in the range [-1, 1]")
+  }
+  if (any(start_parms[-1] < 0)) {
+    stop("start_parms[2:5] should be nonnegative")
+  }
 
   ntime <- nrow(region1)
   l1 <- nrow(r1_coords)
