@@ -72,7 +72,7 @@ fit_qfuncmm <- function(
   if (reorder) {
     if (!silent) cat("Reordering...")
     if (n < 1e5) { # maxmin ordering if n < 100000
-      ord <- order_maxmin(locs, lonlat = FALSE, space_time = TRUE, exclude_dims = region_loc_id)
+      ord <- order_maxmin(locs, lonlat = FALSE, space_time = TRUE, st_scale = st_scale, exclude_dims = region_loc_id)
     } else { # otherwise random order
       ord <- sample(n)
     }
@@ -156,6 +156,8 @@ fit_qfuncmm <- function(
   fit$y <- y
   fit$locs <- locs
   fit$X <- X
+  names(fit$covparms) <- c("rho", "k_eta1", "k_eta2", "tau_eta", "nugget_eta")
+  names(fit$logparms) <- names(fit$covparms)
   class(fit) <- "GpGp_fit"
   return(fit)
 }
