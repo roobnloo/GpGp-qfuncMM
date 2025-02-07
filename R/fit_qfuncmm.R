@@ -93,9 +93,8 @@ fit_qfuncmm <- function(
   # get neighbor array if not provided
   if (is.null(NNarray)) {
     if (!silent) cat("Finding nearest neighbors...")
-    NNarray <- find_ordered_nn(locsord,
-      m = max(m_seq), lonlat = FALSE,
-      st_scale = st_scale, exclude_dims = region_loc_id
+    NNarray <- find_ordered_nn_region_aware(
+      locsord, max(m_seq), st_scale, region_loc_id
     )
     if (!silent) cat("Done \n")
   }
