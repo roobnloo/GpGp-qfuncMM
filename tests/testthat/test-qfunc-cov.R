@@ -33,6 +33,24 @@ test_that("QFunc Covariance Matrix", {
   )
   expect_equal(covmx, expect_c)
 
+  locs_full <- matrix(
+    c(
+      21, 21, 10, 1, 0,
+      21, 21, 10, 2, 0,
+      21, 23, 10, 1, 0,
+      21, 23, 10, 2, 0,
+      15, 4, 11, 1, 1,
+      15, 4, 11, 2, 1,
+      16, 3, 11, 1, 1,
+      16, 3, 11, 2, 1
+    ),
+    ncol = 5,
+    byrow = TRUE
+  )
+
+  covmx2 <- round(test_qfunc_cov(s1, s2, locs_full), 2)
+  expect_equal(covmx2[c(1, 3, 5, 8), c(1, 3, 5, 8)], expect_c)
+
   dcov <- test_d_qfunc_cov(s1, s2, locs)
   expect_equal(dim(dcov), c(4, 4, 5))
 })
