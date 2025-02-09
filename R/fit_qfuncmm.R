@@ -112,11 +112,11 @@ fit_qfuncmm <- function(
         likobj <- vecchia_grouped_profbeta_loglik_grad_info(
           link(lp), covfun_name, yord, Xord, locsord, NNlist, stage1_parms
         )
-        likobj$loglik <- -likobj$loglik - pen(link(lp))
+        likobj$loglik <- -likobj$loglik - pen(lp)
         likobj$grad <- -c(likobj$grad) * dlink(lp) -
-          dpen(link(lp)) * dlink(lp)
+          dpen(lp) * dlink(lp)
         likobj$info <- likobj$info * outer(dlink(lp), dlink(lp)) -
-          ddpen(link(lp)) * outer(dlink(lp), dlink(lp))
+          ddpen(lp) * outer(dlink(lp), dlink(lp))
         likobj$grad <- likobj$grad[active]
         likobj$info <- likobj$info[active, active]
         return(likobj)
@@ -202,9 +202,26 @@ get_qfuncmm_linkfun <- function() {
 }
 
 get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
-  # by default, no penalty
-  pen <- function(x) 0.0
-  dpen <- function(x) rep(0, length(x))
-  ddpen <- function(x) matrix(0, length(x), length(x))
+  # pen <- function(x) 0.0
+  # dpen <- function(x) rep(0,length(x))
+  # ddpen <- function(x) matrix(0,length(x),length(x))
+  pen <- \(x) {
+    prho <- -log1p(exp(x[1]^2 / 3 - 6))
+    prho
+  }
+  dpen <- function(x) {
+    rho <- x[1]
+    ex <- exp(rho^2 / 3 - 6)
+    dpenrho <- 2 * ex * rho / (3 * (1 + ex))
+    c(-dpenrho, rep(0, length(x) - 1))
+  }
+  ddpen <- function(x) {
+    rho <- x[1]
+    numerator <- 6 * exp(2 * rho^2 / 3) + exp(6 + rho^2 / 3) * (6 + 4 * rho^2)
+    denominator <- 9 * (exp(6) + exp(rho^2 / 3))^2
+    dd <- matrix(0, length(x), length(x))
+    dd[1, 1] <- -numerator / denominator
+    dd
+  }
   return(list(pen = pen, dpen = dpen, ddpen = ddpen))
 }
