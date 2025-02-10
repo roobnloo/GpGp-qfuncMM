@@ -205,23 +205,40 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
   # pen <- function(x) 0.0
   # dpen <- function(x) rep(0,length(x))
   # ddpen <- function(x) matrix(0,length(x),length(x))
+  pen_nug <- function(x, j) {
+    pen_loglo(exp(x[j]), .01, log(0.01))
+  }
+  dpen_nug <- function(x, j) {
+    dpen <- rep(0, length(x))
+    dpen[j] <- dpen_loglo(exp(x[j]), .01, log(0.01))
+    return(dpen)
+  }
+  ddpen_nug <- function(x, j) {
+    ddpen <- matrix(0, length(x), length(x))
+    ddpen[j, j] <- ddpen_loglo(exp(x[j]), .01, log(0.01))
+    return(ddpen)
+  }
   pen <- \(x) {
     prho <- -log1p(exp(x[1]^2 / 3 - 6))
-    prho
+    pnug <- pen_nug(x, 5)
+    prho + pnug
   }
   dpen <- function(x) {
     rho <- x[1]
     ex <- exp(rho^2 / 3 - 6)
     dpenrho <- 2 * ex * rho / (3 * (1 + ex))
-    c(-dpenrho, rep(0, length(x) - 1))
+    dpenrho <- c(-dpenrho, rep(0, length(x) - 1))
+    dpennug <- dpen_nug(x, 5)
+    dpenrho + dpennug
   }
   ddpen <- function(x) {
     rho <- x[1]
     numerator <- 6 * exp(2 * rho^2 / 3) + exp(6 + rho^2 / 3) * (6 + 4 * rho^2)
     denominator <- 9 * (exp(6) + exp(rho^2 / 3))^2
-    dd <- matrix(0, length(x), length(x))
-    dd[1, 1] <- -numerator / denominator
-    dd
+    ddrho <- matrix(0, length(x), length(x))
+    ddrho[1, 1] <- -numerator / denominator
+    ddnug <- ddpen_nug(x, 5)
+    ddrho + ddnug
   }
   return(list(pen = pen, dpen = dpen, ddpen = ddpen))
 }
