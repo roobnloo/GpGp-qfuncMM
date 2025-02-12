@@ -76,11 +76,7 @@ fit_qfuncmm <- function(
   # get an ordering and reorder everything
   if (reorder) {
     if (!silent) cat("Reordering...")
-    if (n < 1e5) { # maxmin ordering if n < 100000
-      ord <- order_maxmin(locs, lonlat = FALSE, space_time = TRUE, st_scale = st_scale, exclude_dims = region_loc_id)
-    } else { # otherwise random order
-      ord <- sample(n)
-    }
+    ord <- order_qfuncmm(locs)
     if (!silent) cat("Done \n")
   } else {
     ord <- 1:n
