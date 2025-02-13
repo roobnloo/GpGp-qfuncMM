@@ -135,17 +135,17 @@ fisher_scoring <- function(
         }
 
         # check again, move along gradient
-        if (likobj$loglik > likobj0$loglik) {
-            info0 <- diag(rep(mean(diag(info)), nrow(info)))
-            step <- -solve(info0, grad)
+        if( likobj$loglik > likobj0$loglik ){
+            info0 <- diag( rep(mean(diag(info)),nrow(info)), nrow = nrow(info) )
+            step <- -solve(info0,grad)
             newlogparms <- logparms + step
             likobj <- likfun(newlogparms)
         }
 
         # check once move, take smaller step along gradient
-        if (likobj$loglik > likobj0$loglik) {
-            info0 <- diag(rep(max(diag(info)), nrow(info)))
-            step <- -solve(info0, grad)
+        if( likobj$loglik > likobj0$loglik ){
+            info0 <- diag( rep(max(diag(info)),nrow(info)), nrow = nrow(info) )
+            step <- -solve(info0,grad)
             newlogparms <- logparms + step
             likobj <- likfun(newlogparms)
         }

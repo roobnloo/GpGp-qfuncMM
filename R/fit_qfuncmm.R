@@ -57,9 +57,20 @@ fit_qfuncmm <- function(
   # Create design matrix
   X <- Matrix::bdiag(rep(1, nl1), rep(1, nl2))
 
-  # TODO: handle fixed_parms
-  start_parms <- get_qfuncmm_start_parms(start_parms)
-  active <- rep(TRUE, length(start_parms)) # this says all variables are estimated
+  if (is.null(fixed_parms)) {
+    start_parms <- get_qfuncmm_start_parms(start_parms)
+    active <- rep(TRUE, length(start_parms))
+  } else {
+    if (is.null(start_parms)) {
+      stop("start_parms must be specified whenever fixed_parms is")
+    }
+    start <- get_qfuncmm_start_parms(start_parms)
+    if (length(start) != length(start_parms)) {
+      stop("start_parms not the correct length")
+    }
+    active <- rep(TRUE, length(start_parms))
+    active[fixed_parms] <- FALSE
+  }
 
   # get link functions
   linkfuns <- get_qfuncmm_linkfun()
@@ -113,7 +124,7 @@ fit_qfuncmm <- function(
         likobj$info <- likobj$info * outer(dlink(lp), dlink(lp)) -
           ddpen(link(lp)) * outer(dlink(lp), dlink(lp))
         likobj$grad <- likobj$grad[active]
-        likobj$info <- likobj$info[active, active]
+        likobj$info <- likobj$info[active, active, drop = FALSE]
         return(likobj)
       }
     } else {
@@ -157,7 +168,7 @@ fit_qfuncmm <- function(
   fit$locs <- locs
   fit$X <- X
   names(fit$covparms) <- c("rho", "k_eta1", "k_eta2", "tau_eta", "nugget_eta")
-  names(fit$logparms) <- names(fit$covparms)
+  names(fit$logparms) <- names(fit$covparms[active])
   class(fit) <- "GpGp_fit"
   return(fit)
 }
