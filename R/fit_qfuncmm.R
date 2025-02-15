@@ -10,10 +10,11 @@
 #' @param r2_coords \eqn{L_2\times 3} matrix of coordinates for region2
 #' @param start_parms \eqn{5} vector of starting values
 #' @param stage1_parms \eqn{2 \times 5} matrix of stage1 starting values
+#' @param ord User-specified ordering
 #' @inheritParams fit_model
 fit_qfuncmm <- function(
     region1, region2, r1_coords, r2_coords, start_parms, stage1_parms,
-    NNarray = NULL, reorder = TRUE, group = TRUE,
+    NNarray = NULL, ord = NULL, group = TRUE,
     m_seq = c(10, 30), max_iter = 40, fixed_parms = NULL,
     silent = FALSE, st_scale = NULL, convtol = 1e-4) {
   covfun_name <- "qfuncmm"
@@ -52,7 +53,6 @@ fit_qfuncmm <- function(
 
   locs <- rbind(locs1, locs2)
   y <- c(region1, region2)
-  n <- length(y)
 
   # Create design matrix
   X <- Matrix::bdiag(rep(1, nl1), rep(1, nl2))
@@ -85,12 +85,10 @@ fit_qfuncmm <- function(
   ddpen <- penalty$ddpen
 
   # get an ordering and reorder everything
-  if (reorder) {
+  if (is.null(ord)) {
     if (!silent) cat("Reordering...")
     ord <- order_qfuncmm(locs)
     if (!silent) cat("Done \n")
-  } else {
-    ord <- 1:n
   }
   yord <- y[ord]
   locsord <- locs[ord, , drop = FALSE]
