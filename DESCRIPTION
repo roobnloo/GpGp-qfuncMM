@@ -26,7 +26,8 @@ License: MIT + file LICENSE
 Imports:
     Rcpp (>= 0.12.13),
     FNN,
-    Matrix
+    Matrix,
+    matrixStats
 Suggests:
     fields,
     knitr,

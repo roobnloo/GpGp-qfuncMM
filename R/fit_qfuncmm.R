@@ -68,7 +68,6 @@ fit_qfuncmm <- function(
   invlink <- linkfuns$invlink
   invlink_startparms <- invlink(start_parms)
 
-  # TODO: implement penalty?
   penalty <- get_qfuncmm_penalty(y, X, locs, covfun_name)
   pen <- penalty$pen
   dpen <- penalty$dpen
@@ -112,11 +111,11 @@ fit_qfuncmm <- function(
         likobj <- vecchia_grouped_profbeta_loglik_grad_info(
           link(lp), covfun_name, yord, Xord, locsord, NNlist, stage1_parms
         )
-        likobj$loglik <- -likobj$loglik - pen(lp)
+        likobj$loglik <- -likobj$loglik - pen(link(lp))
         likobj$grad <- -c(likobj$grad) * dlink(lp) -
-          dpen(lp) * dlink(lp)
+          dpen(link(lp)) * dlink(lp)
         likobj$info <- likobj$info * outer(dlink(lp), dlink(lp)) -
-          ddpen(lp) * outer(dlink(lp), dlink(lp))
+          ddpen(link(lp)) * outer(dlink(lp), dlink(lp))
         likobj$grad <- likobj$grad[active]
         likobj$info <- likobj$info[active, active]
         return(likobj)
@@ -192,9 +191,9 @@ sigmoid <- function(x, lower, upper) {
 # get the qfuncmm link function
 # parameter list: (rho, k_eta1, k_eta2, tau_eta, nugget_eta)
 get_qfuncmm_linkfun <- function() {
-  link <- \(x) c(invsigmoid(x[1], -1, 1), exp(x[2:5]))
+  link <- \(x) c(invsigmoid(x[1], -1, 1), exp(x[2:5])) # link puts optimization parameters to the real scale
   dlink <- \(x) c(d_invsigmoid(x[1], -1, 1), exp(x[2:5]))
-  invlink <- \(x) c(sigmoid(x[1], -1, 1), log(x[2:5]))
+  invlink <- \(x) c(sigmoid(x[1], -1, 1), log(x[2:5])) # invlink puts parameters on the optimization scale
 
   return(list(
     link = link, dlink = dlink, invlink = invlink
@@ -219,26 +218,43 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
     return(ddpen)
   }
   pen <- \(x) {
-    prho <- -log1p(exp(x[1]^2 / 3 - 6))
+    rho_logit <- stats::qlogis((x[1] + 1) / 2)
+    prho <- -matrixStats::logSumExp(c(0, rho_logit^2 / 3 - 6))
+    pketa1 <- pen_nug(x, 2)
+    pketa2 <- pen_nug(x, 3)
+    ptaueta <- pen_nug(x, 4)
     pnug <- pen_nug(x, 5)
-    prho + pnug
+    prho + pketa1 + pketa2 + ptaueta + pnug
   }
   dpen <- function(x) {
     rho <- x[1]
-    ex <- exp(rho^2 / 3 - 6)
-    dpenrho <- 2 * ex * rho / (3 * (1 + ex))
+    rho_logit <- stats::qlogis((rho + 1) / 2)
+    ex <- exp(rho_logit^2 / 3 - 6)
+    dpenrho <- 2 * ex * rho_logit / (3 * (1 + ex))
+    dpenrho <- dpenrho * (-2 / (rho^2 + 1)) # chain rule logit'(rho)
     dpenrho <- c(-dpenrho, rep(0, length(x) - 1))
+    dpenketa1 <- dpen_nug(x, 2)
+    dpenketa2 <- dpen_nug(x, 3)
+    dpentaueta <- dpen_nug(x, 4)
     dpennug <- dpen_nug(x, 5)
-    dpenrho + dpennug
+    dpenrho + dpenketa1 + dpenketa2 + dpentaueta + dpennug
   }
   ddpen <- function(x) {
     rho <- x[1]
-    numerator <- 6 * exp(2 * rho^2 / 3) + exp(6 + rho^2 / 3) * (6 + 4 * rho^2)
-    denominator <- 9 * (exp(6) + exp(rho^2 / 3))^2
+
+    log_term <- log(-(1 + rho) / (rho - 1))
+    exp_term <- exp(log_term^2 / 3)
+    e6 <- exp(6)
+    numerator <- 8 * exp_term * (3 * (e6 + exp_term) + 3 * (e6 + exp_term) * rho * log_term + 2 * e6 * log_term^2)
+    denominator <- 9 * (e6 + exp_term)^2 * (1 - rho)^2 * (1 + rho)^2
+
     ddrho <- matrix(0, length(x), length(x))
     ddrho[1, 1] <- -numerator / denominator
+    ddketa1 <- ddpen_nug(x, 2)
+    ddketa2 <- ddpen_nug(x, 3)
+    ddtaueta <- ddpen_nug(x, 4)
     ddnug <- ddpen_nug(x, 5)
-    ddrho + ddnug
+    ddrho + ddketa1 + ddketa2 + ddtaueta + ddnug
   }
   return(list(pen = pen, dpen = dpen, ddpen = ddpen))
 }
