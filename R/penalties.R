@@ -11,10 +11,7 @@ expit <- function(x) {
 #' @rdname expit
 # intexpit <- function(x){ log(1+exp(x)) }
 intexpit <- function(x) {
-  if (x > 20) {
-    return(20)
-  }
-  log1p(exp(x))
+  matrixStats::logSumExp(c(0, x))
 }
 
 #' penalize large values of parameter: penalty, 1st deriative, 2nd derivative

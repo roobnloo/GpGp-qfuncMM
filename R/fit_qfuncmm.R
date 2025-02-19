@@ -210,16 +210,16 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
   # dpen <- function(x) rep(0,length(x))
   # ddpen <- function(x) matrix(0,length(x),length(x))
   pen_nug <- function(x, j) {
-    pen_loglo(exp(x[j]), .01, log(0.01))
+    pen_loglo(x[j], 0.01, log(0.01))
   }
   dpen_nug <- function(x, j) {
     dpen <- rep(0, length(x))
-    dpen[j] <- dpen_loglo(exp(x[j]), .01, log(0.01))
+    dpen[j] <- dpen_loglo(x[j], 0.01, log(0.01))
     return(dpen)
   }
   ddpen_nug <- function(x, j) {
     ddpen <- matrix(0, length(x), length(x))
-    ddpen[j, j] <- ddpen_loglo(exp(x[j]), .01, log(0.01))
+    ddpen[j, j] <- ddpen_loglo(x[j], 0.01, log(0.01))
     return(ddpen)
   }
   pen <- \(x) {
