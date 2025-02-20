@@ -89,7 +89,6 @@ fit_qfuncmm <- function(
   # Create design matrix
   X <- Matrix::bdiag(rep(1, nl1), rep(1, nl2))
 
-  start_parms <- get_qfuncmm_start_parms(start_parms)
   active <- rep(TRUE, length(start_parms)) # this says all variables are estimated
 
   # get link functions
@@ -122,7 +121,7 @@ fit_qfuncmm <- function(
 
   # get neighbor array if not provided
   if (is.null(NNarray)) {
-    if (!silent) cat("Finding nearest neighbors...")
+    if (!silent) cat(sprintf("Finding nearest %d neighbors...", max(m_seq)))
     NNarray <- find_ordered_nn_region_aware(
       locsord, max(m_seq), st_scale, region_loc_id
     )
@@ -202,12 +201,6 @@ fit_qfuncmm <- function(
 }
 
 
-# get default starting values
-get_qfuncmm_start_parms <- function(start_parms) {
-  start_parms
-}
-
-
 # rho in (-Inf, Inf) to [0,1], the original scale
 invsigmoid <- function(x, lower, upper) {
   lower + (upper - lower) * stats::plogis(x)
@@ -252,12 +245,28 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
     ddpen[j, j] <- ddpen_loglo(x[j], .01, log(0.01))
     return(ddpen)
   }
+  pen_large <- function(xvec, j) {
+    x <- xvec[j]
+    -matrixStats::logSumExp(c(0, x^2 / 4 - 6))
+  }
+  dpen_large <- function(xvec, j) {
+    x <- xvec[j]
+    -exp(x^2 / 4 + log(x) - log(2) - matrixStats::logSumExp(c(6, x^2 / 4)))
+  }
+  ddpen_large <- function(xvec, j) {
+    ddpen <- matrix(0, length(xvec), length(xvec))
+    x <- xvec[j]
+    denom <- log(4) + 2 * matrixStats::logSumExp(c(6, x^2 / 4))
+    p1 <- log(2) + x^2 / 2 - denom
+    p2 <- 6 + x^2 / 4 + log(2 + x^2) - denom
+    ddpen[j, j] <- -(exp(p1) + exp(p2))
+  }
   pen <- \(x) {
     rho_logit <- stats::qlogis((x[1] + 1) / 2)
     prho <- -matrixStats::logSumExp(c(0, rho_logit^2 / 3 - 6))
     pketa1 <- pen_nug(x, 2)
     pketa2 <- pen_nug(x, 3)
-    ptaueta <- pen_nug(x, 4)
+    ptaueta <- pen_nug(x, 4) + pen_large(x, 4)
     pnug <- pen_nug(x, 5)
     prho + pketa1 + pketa2 + ptaueta + pnug
   }
@@ -270,7 +279,7 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
     dpenrho <- c(-dpenrho, rep(0, length(x) - 1))
     dpenketa1 <- dpen_nug(x, 2)
     dpenketa2 <- dpen_nug(x, 3)
-    dpentaueta <- dpen_nug(x, 4)
+    dpentaueta <- dpen_nug(x, 4) + dpen_large(x, 4)
     dpennug <- dpen_nug(x, 5)
     dpenrho + dpenketa1 + dpenketa2 + dpentaueta + dpennug
   }
@@ -287,7 +296,7 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
     ddrho[1, 1] <- -numerator / denominator
     ddketa1 <- ddpen_nug(x, 2)
     ddketa2 <- ddpen_nug(x, 3)
-    ddtaueta <- ddpen_nug(x, 4)
+    ddtaueta <- ddpen_nug(x, 4) + ddpen_large(x, 4)
     ddnug <- ddpen_nug(x, 5)
     ddrho + ddketa1 + ddketa2 + ddtaueta + ddnug
   }

@@ -21,7 +21,7 @@ temporal_obj <- function(theta, data_cross, time_sqrd, xi_tim, tau_gamma) {
 
 # Initialize parameters for a single region
 init_region <- function(region_info) {
-  s1 <- region_info$stage1 # Stage 1 estimates
+  s1 <- unlist(region_info$stage1) # Stage 1 estimates
   data <- region_info$data_std # Standardized data
   n_time <- nrow(data)
   n_voxel <- ncol(data)
@@ -76,7 +76,9 @@ init_region <- function(region_info) {
   # Compute nugget_eta using the ratio of total to temporal variance
   nugget_eta <- max(1e-2, chi_tot / chi_tim - 1)
 
-  c(k_eta = k_eta, tau_eta = tau_eta, nugget_eta = nugget_eta)
+  result <- c(k_eta = k_eta, tau_eta = tau_eta, nugget_eta = nugget_eta)
+  names(result) <- c("k_eta", "tau_eta", "nugget_eta")
+  return(result)
 }
 
 # Main stage 2 initialization function
