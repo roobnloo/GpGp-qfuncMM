@@ -231,7 +231,7 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
     rho_logit <- stats::qlogis((rho + 1) / 2)
     ex <- exp(rho_logit^2 / 3 - 6)
     dpenrho <- 2 * ex * rho_logit / (3 * (1 + ex))
-    dpenrho <- dpenrho * (-2 / (rho^2 + 1)) # chain rule logit'(rho)
+    dpenrho <- dpenrho * (-2 / (rho^2 - 1)) # chain rule logit'(rho)
     dpenrho <- c(-dpenrho, rep(0, length(x) - 1))
     dpenketa1 <- dpen_nug(x, 2)
     dpenketa2 <- dpen_nug(x, 3)
