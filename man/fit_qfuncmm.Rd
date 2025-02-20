@@ -5,12 +5,9 @@
 \title{Fit the QFunC Mixed Effects Model}
 \usage{
 fit_qfuncmm(
-  region1,
-  region2,
-  r1_coords,
-  r2_coords,
-  start_parms,
-  stage1_parms,
+  region1_info,
+  region2_info,
+  start_parms = NULL,
   NNarray = NULL,
   reorder = TRUE,
   group = TRUE,
@@ -23,17 +20,11 @@ fit_qfuncmm(
 )
 }
 \arguments{
-\item{region1}{\eqn{M\times L_1} matrix for region1}
+\item{region1_info}{stage 1 info list for region 1}
 
-\item{region2}{\eqn{M\times L_2} matrix for region2}
+\item{region2_info}{stage 1 info list for region 2}
 
-\item{r1_coords}{\eqn{L_1\times 3} matrix of coordinates for region1}
-
-\item{r2_coords}{\eqn{L_2\times 3} matrix of coordinates for region2}
-
-\item{start_parms}{\eqn{5} vector of starting values}
-
-\item{stage1_parms}{\eqn{2 \times 5} matrix of stage1 starting values}
+\item{start_parms}{\eqn{5} vector of starting values. Computed automatically if unspecified.}
 
 \item{NNarray}{Optionally specified array of nearest neighbor indices, 
 usually from the output of \code{\link{find_ordered_nn}}. If \code{NULL}, 
@@ -85,6 +76,10 @@ See Argo vignette for an example.}
 Fisher scoring is stopped
 when the dot product between the step and the gradient 
 is less than \code{convtol}.}
+
+\item{stage1_parms}{\eqn{2 \times 5} matrix of stage1 starting values}
+
+\item{cov_setting}{whether or not the two regions are fit with the noisy QFunC model.}
 }
 \description{
 Given a response, set of locations, (optionally) a design matrix,

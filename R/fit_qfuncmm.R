@@ -4,23 +4,55 @@
 #' and a specified covariance function, return the maximum
 #' Vecchia likelihood estimates, obtained with a Fisher scoring algorithm.
 #'
-#' @param region1 \eqn{M\times L_1} matrix for region1
-#' @param region2 \eqn{M\times L_2} matrix for region2
-#' @param r1_coords \eqn{L_1\times 3} matrix of coordinates for region1
-#' @param r2_coords \eqn{L_2\times 3} matrix of coordinates for region2
-#' @param start_parms \eqn{5} vector of starting values
+#' @param region1_info stage 1 info list for region 1
+#' @param region2_info stage 1 info list for region 2
+#' @param start_parms \eqn{5} vector of starting values. Computed automatically if unspecified.
 #' @param stage1_parms \eqn{2 \times 5} matrix of stage1 starting values
+#' @param cov_setting whether or not the two regions are fit with the noisy QFunC model.
 #' @inheritParams fit_model
 fit_qfuncmm <- function(
-    region1, region2, r1_coords, r2_coords, start_parms, stage1_parms,
+    region1_info, region2_info, start_parms = NULL,
     NNarray = NULL, reorder = TRUE, group = TRUE,
     m_seq = c(10, 30), max_iter = 40, fixed_parms = NULL,
     silent = FALSE, st_scale = NULL, convtol = 1e-4) {
+  required_elements <- c("data_std", "coords", "stage1", "eblue")
+  check_required_elements <- function(info, region_name) {
+    missing_elements <- setdiff(required_elements, names(info))
+    if (length(missing_elements) > 0) {
+      stop(sprintf(
+        "The %s_info list is missing the following required elements: %s",
+        region_name, paste(missing_elements, collapse = ", ")
+      ))
+    }
+  }
+  check_required_elements(region1_info, "region1")
+  check_required_elements(region2_info, "region2")
+
+  region1 <- region1_info$data_std
+  region2 <- region2_info$data_std
+  r1_coords <- region1_info$coords
+  r2_coords <- region2_info$coords
+  stage1_parms <- rbind(
+    unlist(region1_info$stage1[c("k_gamma", "nugget_gamma", "tau_gamma", "phi_gamma", "sigma2_ep")]),
+    unlist(region2_info$stage1[c("k_gamma", "nugget_gamma", "tau_gamma", "phi_gamma", "sigma2_ep")])
+  )
+  stage1_parms[, 5] <- sqrt(stage1_parms[, 5])
+
+  if (is.null(start_parms)) {
+    start_parms <- stage2_init(region1_info, region2_info)
+  } else {
+    if (length(start_parms) != 5) {
+      stop("start_parms must be a vector of length 5")
+    }
+    if (any(is.na(start_parms))) {
+      stop("start_parms cannot contain NA values")
+    }
+  }
+
   covfun_name <- "qfuncmm"
   stopifnot("nrow(region1) and nrow(region2) must be equal" = nrow(region1) == nrow(region2))
   stopifnot("ncol(region1) and nrow(r1_coords) must be equal" = ncol(region1) == nrow(r1_coords))
   stopifnot("ncol(region2) and nrow(r2_coords) must be equal" = ncol(region2) == nrow(r2_coords))
-  stopifnot("length(start_parms) must be equal to 5" = length(start_parms) == 5)
 
   if (start_parms[1] < -1 || start_parms[1] > 1) {
     stop("start_parms[1] (rho) should be in the range [-1, 1]")
@@ -57,7 +89,6 @@ fit_qfuncmm <- function(
   # Create design matrix
   X <- Matrix::bdiag(rep(1, nl1), rep(1, nl2))
 
-  # TODO: handle fixed_parms
   start_parms <- get_qfuncmm_start_parms(start_parms)
   active <- rep(TRUE, length(start_parms)) # this says all variables are estimated
 
@@ -97,6 +128,10 @@ fit_qfuncmm <- function(
     )
     if (!silent) cat("Done \n")
   }
+  message(sprintf(
+    "Running QFunCMM with initial parameters: rho = %.2f, k_eta1 = %.2f, k_eta2 = %.2f, tau_eta = %.2f, nugget_eta = %.2f",
+    start_parms[1], start_parms[2], start_parms[3], start_parms[4], start_parms[5]
+  ))
 
   # refine the estimates using m in m_seq
   for (i in seq_along(m_seq)) {
@@ -205,16 +240,16 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
   # dpen <- function(x) rep(0,length(x))
   # ddpen <- function(x) matrix(0,length(x),length(x))
   pen_nug <- function(x, j) {
-    pen_loglo(exp(x[j]), .01, log(0.01))
+    pen_loglo(x[j], .01, log(0.01))
   }
   dpen_nug <- function(x, j) {
     dpen <- rep(0, length(x))
-    dpen[j] <- dpen_loglo(exp(x[j]), .01, log(0.01))
+    dpen[j] <- dpen_loglo(x[j], .01, log(0.01))
     return(dpen)
   }
   ddpen_nug <- function(x, j) {
     ddpen <- matrix(0, length(x), length(x))
-    ddpen[j, j] <- ddpen_loglo(exp(x[j]), .01, log(0.01))
+    ddpen[j, j] <- ddpen_loglo(x[j], .01, log(0.01))
     return(ddpen)
   }
   pen <- \(x) {
