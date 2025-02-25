@@ -247,19 +247,22 @@ get_qfuncmm_penalty <- function(y, X, locs, covfun_name) {
   }
   pen_large <- function(xvec, j) {
     x <- xvec[j]
-    -matrixStats::logSumExp(c(0, x^2 / 4 - 6))
+    -matrixStats::logSumExp(c(0, x^2 / 6 - 6))
   }
   dpen_large <- function(xvec, j) {
+    dpen <- rep(0, length(xvec))
     x <- xvec[j]
-    -exp(x^2 / 4 + log(x) - log(2) - matrixStats::logSumExp(c(6, x^2 / 4)))
+    dpen[j] <- -exp(x^2 / 6 + log(x) - log(3) - matrixStats::logSumExp(c(6, x^2 / 6)))
+    return(dpen)
   }
   ddpen_large <- function(xvec, j) {
     ddpen <- matrix(0, length(xvec), length(xvec))
     x <- xvec[j]
-    denom <- log(4) + 2 * matrixStats::logSumExp(c(6, x^2 / 4))
-    p1 <- log(2) + x^2 / 2 - denom
-    p2 <- 6 + x^2 / 4 + log(2 + x^2) - denom
+    denom <- log(9) + 2 * matrixStats::logSumExp(c(6, x^2 / 6))
+    p1 <- log(3) + x^2 / 3 - denom
+    p2 <- 6 + x^2 / 6 + log(3 + x^2) - denom
     ddpen[j, j] <- -(exp(p1) + exp(p2))
+    return(ddpen)
   }
   pen <- \(x) {
     rho_logit <- stats::qlogis((x[1] + 1) / 2)
