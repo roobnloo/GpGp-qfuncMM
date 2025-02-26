@@ -174,6 +174,7 @@ fisher_scoring <- function(
         #    mult <- mult*0.5
         # }
         stepgrad <- c(crossprod(step, grad))
+        rho_stepgrad <- step[1] * grad[1]
 
         # redefine logparms, loglik, grad, info
         logparms <- logparms + step
@@ -190,11 +191,12 @@ fisher_scoring <- function(
             cat("grad = ")
             cat(as.character(round(grad, 4)), "\n")
             cat("step dot grad = ", stepgrad, "\n")
+            cat("rho step dot grad = ", rho_stepgrad, "\n")
             cat("\n")
         }
 
         # if gradient is small, then break and return the results
-        if (abs(stepgrad) < convtol || no_decrease) {
+        if (abs(rho_stepgrad) < convtol || no_decrease) {
             break
         }
     }
@@ -217,7 +219,7 @@ fisher_scoring <- function(
         no_decrease = no_decrease,
         grad = likobj$grad,
         info = likobj$info,
-        conv = (abs(stepgrad) < convtol || no_decrease)
+        conv = (abs(rho_stepgrad) < convtol || no_decrease)
     )
     return(ret)
 }
