@@ -82,7 +82,9 @@ fisher_scoring <- function(
         cat("\n\n")
     }
 
+    numiter <- NULL
     for (j in 1:max_iter) {
+        numiter <- j
         likobj0 <- likobj
 
         # if condition number of info matrix large,
@@ -219,7 +221,8 @@ fisher_scoring <- function(
         no_decrease = no_decrease,
         grad = likobj$grad,
         info = likobj$info,
-        conv = (abs(rho_stepgrad) < convtol || no_decrease)
+        conv = (abs(rho_stepgrad) < convtol || no_decrease),
+        numiter = numiter
     )
     return(ret)
 }
