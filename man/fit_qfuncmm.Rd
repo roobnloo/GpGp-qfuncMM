@@ -76,10 +76,6 @@ See Argo vignette for an example.}
 Fisher scoring is stopped
 when the dot product between the step and the gradient 
 is less than \code{convtol}.}
-
-\item{stage1_parms}{\eqn{2 \times 5} matrix of stage1 starting values}
-
-\item{cov_setting}{whether or not the two regions are fit with the noisy QFunC model.}
 }
 \description{
 Given a response, set of locations, (optionally) a design matrix,

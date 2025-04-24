@@ -82,13 +82,14 @@ init_region <- function(region_info) {
 }
 
 # Main stage 2 initialization function
+#' @importFrom stats cor
 stage2_init <- function(r1_info, r2_info) {
   # Get initial estimates for each region
   r1k <- init_region(r1_info)
   r2k <- init_region(r2_info)
 
   # Use correlation of EBLUEs for rho
-  rho_eblue <- cor(r1_info$eblue, r2_info$eblue)
+  rho_eblue <- stats::cor(r1_info$eblue, r2_info$eblue)
 
   # Average the tau parameters from the two regions
   tau_eta <- mean(c(r1k["tau_eta"], r2k["tau_eta"]))

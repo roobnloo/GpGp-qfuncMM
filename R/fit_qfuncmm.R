@@ -7,9 +7,8 @@
 #' @param region1_info stage 1 info list for region 1
 #' @param region2_info stage 1 info list for region 2
 #' @param start_parms \eqn{5} vector of starting values. Computed automatically if unspecified.
-#' @param stage1_parms \eqn{2 \times 5} matrix of stage1 starting values
-#' @param cov_setting whether or not the two regions are fit with the noisy QFunC model.
 #' @inheritParams fit_model
+#' @export
 fit_qfuncmm <- function(
     region1_info, region2_info, start_parms = NULL,
     NNarray = NULL, reorder = TRUE, group = TRUE,
