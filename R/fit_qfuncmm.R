@@ -7,7 +7,44 @@
 #' @param region1_info stage 1 info list for region 1
 #' @param region2_info stage 1 info list for region 2
 #' @param start_parms \eqn{5} vector of starting values. Computed automatically if unspecified.
-#' @inheritParams fit_model
+#' @param NNarray Optionally specified array of nearest neighbor indices,
+#' usually from the output of \code{\link{find_ordered_nn}}. If \code{NULL},
+#' fit_model will compute the nearest neighbors. We recommend that the user
+#' not specify this unless there is a good reason to (e.g. if doing a comparison
+#' study where one wants to control
+#' \code{NNarray} across different approximations).
+#' @param reorder TRUE/FALSE indicating whether maxmin ordering should be used
+#' (TRUE) or whether no reordering should be done before fitting (FALSE).
+#' If you want
+#' to use a customized reordering, then manually reorder \code{y}, \code{locs},
+#' and \code{X},
+#' and then set \code{reorder} to \code{FALSE}. A random reordering is used
+#' when \code{nrow(locs) > 1e5}.
+#' @param group TRUE/FALSE for whether to use the grouped version of
+#' the approximation (Guinness, 2018) or not.  The grouped version
+#' is used by default and is always recommended.
+#' @param m_seq Sequence of values for number of neighbors. By default,
+#' a 10-neighbor
+#' approximation is maximized, then a 30-neighbor approximation is
+#' maximized using the
+#' 10 neighbor estimates as starting values.
+#' However, one can specify any sequence
+#' of numbers of neighbors, e.g. \code{m_seq = c(10,30,60,90)}.
+#' @param max_iter maximum number of Fisher scoring iterations
+#' @param fixed_parms Indices of covariance parameters you would like to fix
+#' at specific values. If you decide to fix any parameters, you must specify
+#' their values in \code{start_parms}, along with the starting values for
+#' all other parameters. For example, to fix the nugget at zero in
+#' \code{exponential_isotropic}, set \code{fixed_parms} to \code{c(3)}, and set
+#' \code{start_parms} to \code{c(4.7,3.1,0)}. The
+#' last element of \code{start_parms} (the nugget parameter) is set to zero,
+#' while the starting values for the other two parameters are 4.7 and 3.1.
+#' @param silent TRUE/FALSE for whether to print some information during fitting.
+#' @param st_scale Scaling for spatial and temporal ranges.
+#' @param convtol Tolerance for exiting the optimization.
+#' Fisher scoring is stopped
+#' when the dot product between the step and the gradient
+#' is less than \code{convtol}.
 #' @export
 fit_qfuncmm <- function(
     region1_info, region2_info, start_parms = NULL,
@@ -195,7 +232,7 @@ fit_qfuncmm <- function(
   fit$X <- X
   names(fit$covparms) <- c("rho", "k_eta1", "k_eta2", "tau_eta", "nugget_eta")
   names(fit$logparms) <- names(fit$covparms)
-  class(fit) <- "GpGp_fit"
+  class(fit) <- "GpGpQFuncMM_fit"
   return(fit)
 }
 

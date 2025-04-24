@@ -1,3 +1,3 @@
-#' @useDynLib GpGp
+#' @useDynLib GpGpQFuncMM
 #' @importFrom Rcpp evalCpp
 NULL

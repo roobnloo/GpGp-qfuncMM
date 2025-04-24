@@ -1,4 +1,3 @@
 library(testthat)
-library(GpGp)
-
-test_check("GpGp")
+library(GpGpQFuncMM)
+test_check("GpGpQFuncMM")

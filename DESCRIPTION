@@ -1,24 +1,15 @@
-Package: GpGp
+Package: GpGpQFuncMM
 Type: Package
-Title: Fast Gaussian Process Computation Using Vecchia's Approximation
-Version: 0.5.1
+Title: Stage 2 of QFuncMM via Vecchia's Approximation
+Version: 0.6.0
 Date: 2024-10-15
-Authors@R: c(
-    person("Joseph", "Guinness", email = "joeguinness@gmail.com", role = c("aut", "cre")),
-    person("Matthias", "Katzfuss", email = "katzfuss@gmail.com", role = "aut" ),
-    person("Youssef", "Fahmy", email = "yf297@cornell.edu", role = "aut" ) )
-Maintainer: Joseph Guinness <joeguinness@gmail.com>
-Description: Functions for fitting and doing predictions with
-    Gaussian process models using Vecchia's (1988) approximation. 
-    Package also includes functions for reordering input locations, 
-    finding ordered nearest neighbors (with help from 'FNN' package), 
-    grouping operations, and conditional simulations.
-    Covariance functions for spatial and spatial-temporal data
-    on Euclidean domains and spheres are provided. The original 
-    approximation is due to Vecchia (1988) 
+Authors@R: person("Robin", "Liu", email = "robin28liu@gmail.com", role = c("aut", "cre"))
+Maintainer: Robin Liu <robin28liu@gmail.com>
+Description: Employs Vecchia's approximation to fit stage 2 of the
+    QFunC Mixed Model. The code is largely based on the `GpGp` package by Joe Guiness. 
+    The original approximation is due to Vecchia (1988) 
     <http://www.jstor.org/stable/2345768>, and the reordering and
-    grouping methods are from Guinness (2018) 
-    <doi:10.1080/00401706.2018.1437476>.
+    grouping methods are from Guinness (2018) <doi:10.1080/00401706.2018.1437476>.
     Model fitting employs a Fisher scoring algorithm described
     in Guinness (2019) <doi:10.48550/arXiv.1905.08374>.
 Depends: R (>= 2.10)
